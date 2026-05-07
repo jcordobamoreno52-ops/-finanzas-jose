@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Finanzas — Jose Luis</title>
+<style>
+:root{--bg:#0f0f0f;--s:#1a1a1a;--s2:#222;--b:#2a2a2a;--t:#f0f0f0;--t2:#888;--t3:#444;--green:#00c896;--gd:#003d2e;--red:#ff5a5a;--rd:#3d0a0a;--amber:#f5a623;--ad:#3d2800;--blue:#4a9eff;--bd:#0a1f3d;--purple:#9b7ff4;--pd:#1e1040;}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{background:var(--bg);color:var(--t);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh;max-width:480px;margin:0 auto;}
+.hdr{background:var(--s);border-bottom:1px solid var(--b);padding:12px 16px 0;position:sticky;top:0;z-index:20;}
+.hdr-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.hdr-title{font-size:15px;font-weight:700;}
+.sync{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--t2);}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--amber);}
+.dot.on{background:var(--green);}
+.week-nav{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.wnb{width:32px;height:32px;border-radius:8px;border:1px solid var(--b);background:var(--s2);color:var(--t);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.week-info{flex:1;text-align:center;}
+.wlabel{font-size:16px;font-weight:700;}
+.wdate{font-size:11px;color:var(--t2);margin-top:1px;}
+.tabs{display:flex;gap:1px;background:var(--b);}
+.tab{flex:1;padding:9px 4px;border:none;background:transparent;color:var(--t2);font-size:12px;font-weight:500;cursor:pointer;}
+.tab.active{background:var(--s);color:var(--green);font-weight:700;border-bottom:2px solid var(--green);}
+
+.hero{margin:12px 16px;background:var(--s);border:1px solid var(--b);border-radius:16px;padding:14px;text-align:center;}
+.hero-lbl{font-size:11px;color:var(--t2);letter-spacing:.07em;text-transform:uppercase;margin-bottom:4px;}
+.hero-val{font-size:34px;font-weight:800;font-family:monospace;transition:color .3s;}
+.hero-val.pos{color:var(--green);}
+.hero-val.neg{color:var(--red);}
+.hero-sub{font-size:11px;color:var(--t2);margin-top:5px;}
+.prog-bar{height:5px;background:var(--b);border-radius:99px;overflow:hidden;margin-top:8px;}
+.prog-fill{height:100%;border-radius:99px;transition:width .4s,background .3s;}
+.mini-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:0 16px 12px;}
+.mini-card{background:var(--s);border:1px solid var(--b);border-radius:10px;padding:9px 8px;text-align:center;}
+.mini-val{font-size:13px;font-weight:700;font-family:monospace;}
+.mini-lbl{font-size:9px;color:var(--t2);margin-top:2px;letter-spacing:.04em;}
+
+.view{display:none;padding:0 16px 100px;}
+.view.active{display:block;}
+.sec{margin-bottom:12px;}
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;}
+.sec-title{font-size:11px;font-weight:600;color:var(--t2);letter-spacing:.07em;text-transform:uppercase;}
+.sec-amt{font-size:11px;font-family:monospace;color:var(--t2);}
+.card{background:var(--s);border:1px solid var(--b);border-radius:14px;overflow:hidden;}
+
+.row{display:flex;align-items:center;gap:10px;padding:11px 14px;border-bottom:1px solid var(--b);cursor:pointer;}
+.row:last-child{border-bottom:none;}
+.row:active{background:var(--s2);}
+.row-info{flex:1;min-width:0;}
+.row-name{font-size:14px;font-weight:500;}
+.row-name.done{text-decoration:line-through;color:var(--t3);}
+.row-sub{font-size:11px;color:var(--t2);margin-top:2px;font-family:monospace;}
+.row-sub.g{color:var(--green);}
+.row-sub.w{color:var(--amber);}
+.row-sub.r{color:var(--red);}
+.row-right{display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0;}
+.row-amt{font-size:14px;font-weight:700;font-family:monospace;}
+.row-amt.done{color:var(--t3);text-decoration:line-through;}
+.tag{font-size:10px;padding:2px 7px;border-radius:99px;font-weight:600;}
+.tg{background:var(--bd);color:var(--blue);}
+.tr{background:var(--rd);color:var(--red);}
+.ta{background:var(--ad);color:var(--amber);}
+.tp{background:var(--pd);color:var(--purple);}
+.tgr{background:var(--gd);color:var(--green);}
+.chk{width:26px;height:26px;border-radius:50%;border:1.5px solid var(--b);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;font-size:12px;}
+.chk.paid{background:var(--green);border-color:var(--green);color:#000;}
+.chk.partial{background:var(--ad);border-color:var(--amber);color:var(--amber);}
+.acts{display:flex;gap:5px;margin-top:4px;}
+.act{font-size:11px;padding:3px 9px;border-radius:6px;border:1px solid var(--b);background:var(--s2);color:var(--t2);cursor:pointer;}
+.act.w{border-color:var(--amber);color:var(--amber);background:var(--ad);}
+.act.g{border-color:var(--green);color:var(--green);background:var(--gd);}
+.act.r{border-color:var(--red);color:var(--red);background:var(--rd);}
+
+.extra-row{display:flex;align-items:center;gap:6px;padding:9px 14px;border-top:1px solid var(--b);}
+.ei{background:var(--s2);border:1px solid var(--b);border-radius:8px;padding:7px 10px;font-size:13px;font-family:monospace;color:var(--t);outline:none;}
+.ei:focus{border-color:var(--green);}
+.ea{background:var(--green);border:none;border-radius:8px;padding:7px 14px;font-size:13px;font-weight:700;color:#000;cursor:pointer;}
+
+/* PLAN */
+.week-blk{background:var(--s);border:1px solid var(--b);border-radius:14px;margin-bottom:10px;overflow:hidden;}
+.week-blk.current-week{border-color:var(--green);}
+.whdr{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;cursor:pointer;}
+.whl{display:flex;align-items:center;gap:8px;}
+.wnum{font-size:11px;color:var(--t2);font-weight:600;letter-spacing:.06em;}
+.wdate2{font-size:13px;font-weight:600;}
+.wbadge{font-size:10px;padding:2px 8px;border-radius:99px;font-weight:600;}
+.wb-done{background:var(--gd);color:var(--green);}
+.wb-pend{background:var(--b);color:var(--t2);}
+.wb-key{background:var(--pd);color:var(--purple);}
+.wb-part{background:var(--ad);color:var(--amber);}
+.wb-cur{background:var(--gd);color:var(--green);border:1px solid var(--green);}
+.wprog{height:3px;background:var(--b);}
+.wprog-fill{height:100%;background:var(--green);transition:width .3s;}
+.wbody{border-top:1px solid var(--b);}
+.wnote{padding:8px 14px;background:#111;font-size:11px;color:var(--t2);border-top:1px solid var(--b);}
+.wnote b{color:var(--amber);}
+.chev{color:var(--t2);font-size:11px;transition:transform .2s;}
+.collapsed .chev{transform:rotate(-90deg);}
+.collapsed .wbody{display:none;}
+
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:100;align-items:flex-end;justify-content:center;}
+.modal.open{display:flex;}
+.sheet{background:var(--s);border-radius:20px 20px 0 0;padding:20px 18px 38px;width:100%;max-width:480px;}
+.sh-title{font-size:16px;font-weight:700;margin-bottom:3px;}
+.sh-sub{font-size:12px;color:var(--t2);margin-bottom:14px;font-family:monospace;}
+.inp-row{display:flex;align-items:center;gap:8px;margin-bottom:14px;}
+.inp{flex:1;background:var(--s2);border:1px solid var(--b);border-radius:10px;padding:11px 13px;font-size:18px;font-family:monospace;color:var(--t);outline:none;}
+.inp:focus{border-color:var(--green);}
+.btn-row{display:flex;gap:10px;}
+.bcn{flex:1;padding:12px;border-radius:12px;border:1px solid var(--b);background:transparent;color:var(--t2);font-size:14px;cursor:pointer;}
+.bok{flex:1;padding:12px;border-radius:12px;border:none;background:var(--green);color:#000;font-size:14px;font-weight:700;cursor:pointer;}
+.fbar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:var(--s);border-top:1px solid var(--b);padding:8px 16px 20px;font-size:10px;color:var(--t3);text-align:center;}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <div class="hdr-top">
+    <div class="hdr-title">💰 Finanzas Jose Luis</div>
+    <div class="sync"><div class="dot" id="dot"></div><span id="slbl">Conectando...</span></div>
+  </div>
+  <div class="week-nav">
+    <button class="wnb" onclick="changeWeek(-1)">←</button>
+    <div class="week-info">
+      <div class="wlabel" id="wlabel">S15</div>
+      <div class="wdate" id="wdate">Jueves 7 de mayo, 2026</div>
+    </div>
+    <button class="wnb" onclick="changeWeek(1)">→</button>
+  </div>
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('hogar')">🏠 Hogar</button>
+    <button class="tab" onclick="switchTab('personal')">👤 Personal</button>
+    <button class="tab" onclick="switchTab('deudas')">💳 Deudas</button>
+    <button class="tab" onclick="switchTab('plan')">📅 Plan</button>
+  </div>
+</div>
+
+<div class="hero">
+  <div class="hero-lbl">Disponible esta semana</div>
+  <div class="hero-val pos" id="hero-val">$0</div>
+  <div class="hero-sub" id="hero-sub"></div>
+  <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+</div>
+<div class="mini-grid">
+  <div class="mini-card"><div class="mini-val" id="m-neto" style="color:var(--blue)">$0</div><div class="mini-lbl">NETO NÓMINA</div></div>
+  <div class="mini-card"><div class="mini-val" id="m-fepep" style="color:var(--purple)">$0</div><div class="mini-lbl">FEPEP</div></div>
+  <div class="mini-card"><div class="mini-val" id="m-gastado" style="color:var(--red)">$0</div><div class="mini-lbl">PAGADO</div></div>
+</div>
+
+<div class="view active" id="view-hogar">
+  <div class="sec">
+    <div class="sec-hdr"><span class="sec-title">Gastos fijos de hogar</span><span class="sec-amt" id="h-amt"></span></div>
+    <div class="card" id="hogar-list"></div>
+  </div>
+  <div class="sec">
+    <div class="sec-hdr"><span class="sec-title">Abonos / gastos extra</span></div>
+    <div class="card"><div id="hogar-extras"></div>
+      <div class="extra-row">
+        <input class="ei" id="he-d" placeholder="Descripción" style="flex:2">
+        <input class="ei" id="he-v" placeholder="$" type="number" inputmode="numeric" style="width:85px">
+        <button class="ea" onclick="addExtra('hogar')">+</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="view" id="view-personal">
+  <div class="sec">
+    <div class="sec-hdr"><span class="sec-title">Gastos personales fijos</span><span class="sec-amt" id="p-amt"></span></div>
+    <div class="card" id="personal-list"></div>
+  </div>
+  <div class="sec">
+    <div class="sec-hdr"><span class="sec-title">Gastos extra</span></div>
+    <div class="card"><div id="personal-extras"></div>
+      <div class="extra-row">
+        <input class="ei" id="pe-d" placeholder="Descripción" style="flex:2">
+        <input class="ei" id="pe-v" placeholder="$" type="number" inputmode="numeric" style="width:85px">
+        <button class="ea" onclick="addExtra('personal')">+</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="view" id="view-deudas">
+  <div class="sec">
+    <div class="sec-hdr"><span class="sec-title">Estado de deudas</span><span class="sec-amt" id="d-amt"></span></div>
+    <div class="card" id="deudas-list"></div>
+  </div>
+</div>
+
+<div class="view" id="view-plan">
+  <div id="plan-list"></div>
+</div>
+
+<div class="fbar">Toca un rubro para marcarlo pagado · Se resta del disponible automáticamente</div>
+
+<div class="modal" id="modal">
+  <div class="sheet">
+    <div class="sh-title" id="m-title">Abono</div>
+    <div class="sh-sub" id="m-sub"></div>
+    <div class="inp-row"><span style="font-size:18px;color:var(--t2)">$</span><input class="inp" id="m-inp" type="number" inputmode="numeric" placeholder="0"></div>
+    <div class="btn-row">
+      <button class="bcn" onclick="closeModal()">Cancelar</button>
+      <button class="bok" onclick="confirmModal()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import{initializeApp}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import{getDatabase,ref,onValue,set}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+
+const FC={apiKey:"AIzaSyBzEy0GzXzdCm9T2MJ8_hptNPURp5wXvcw",authDomain:"finanzas-jose.firebaseapp.com",databaseURL:"https://finanzas-jose-default-rtdb.firebaseio.com",projectId:"finanzas-jose",storageBucket:"finanzas-jose.firebasestorage.app",messagingSenderId:"212522808675",appId:"1:212522808675:web:05db83f2413e99ede60f56"};
+
+// ── CONSTANTES ────────────────────────────────────────────────────────────────
+const INGRESO=1539707, FIJAS=311997;
+const START_WEEK=15; // semana 15 = 7 mayo 2026
+const START_DATE=new Date('2026-05-07');
+
+// FEPEP: termina semana 21 (18 junio 2026) = semana interna 7 = global 21
+const FEPEP_CREDITOS=[
+  {id:'bb1',saldo:546506,cuota:113874},
+  {id:'bb2',saldo:30010,cuota:22500},
+  {id:'bb3',saldo:8085,cuota:8085},
+  {id:'bb4',saldo:135160,cuota:43270},
+  {id:'bb5',saldo:37529,cuota:17308},
+  {id:'bb6',saldo:238909,cuota:47597},
+];
+
+const HOGAR=[
+  {id:'mercado',n:'Mercado',v:250000},
+  {id:'servicios',n:'Servicios',v:70000},
+  {id:'internet',n:'Internet',v:30000},
+  {id:'plataformas',n:'Plataformas',v:11750},
+  {id:'bano_perros',n:'Baño perros',v:22500},
+  {id:'comida_perros',n:'Comida perros',v:67500},
+  {id:'isa_arr',n:'Apoyo arriendo Isa',v:12500},
+  {id:'viajes',n:'Viajes',v:50000},
+  {id:'fondo_perros',n:'Fondo preventivo perros',v:25000},
+  {id:'ahorros',n:'Ahorros',v:62500},
+  {id:'salidas',n:'Salidas',v:45000},
+  {id:'arr_mama',n:'Arriendo mamá',v:62500},
+];
+const TOTAL_HOGAR=HOGAR.reduce((a,i)=>a+i.v,0); // 709250
+
+const PERSONAL=[
+  {id:'motilada',n:'Motilada',v:30000},
+  {id:'gasolina',n:'Gasolina moto',v:50000},
+];
+const TOTAL_PERS=PERSONAL.reduce((a,i)=>a+i.v,0); // 80000
+
+// DEUDAS con saldo dinámico
+const DEUDAS_BASE=[
+  {id:'kelly',n:'Kelly',saldo:510000,tag:'tr',tl:'URGENTE'},
+  {id:'juandavid',n:'Juan David',saldo:89000,tag:'ta',tl:'MAYO'},
+  {id:'isa_tarjeta',n:'Tarjeta Isa',saldo:1700000,tag:'tp',tl:'JUNIO'},
+  {id:'suegra',n:'Mamá de Isa',saldo:3200000,tag:'tp',tl:'JUNIO'},
+  {id:'jorgito',n:'Jorgito',saldo:5090000,tag:'tr',tl:'JUNIO'},
+  {id:'velez',n:'Cueros Vélez',saldo:455000,tag:'ta',tl:'SIN FECHA'},
+  {id:'tigo',n:'Tigo',saldo:200000,tag:'ta',tl:'SIN FECHA'},
+  {id:'inmo',n:'Inmobiliaria',saldo:180000,tag:'ta',tl:'SIN FECHA'},
+  {id:'hogar_p',n:'Pendiente hogar',saldo:250000,tag:'ta',tl:'SIN FECHA'},
+  {id:'serlefin',n:'Serlefin',saldo:15000000,tag:'tr',tl:'NEGOCIAR'},
+];
+
+// PLAN: semanas globales (15-52), con pagos que NO metan en rojo
+// neto s15 = 1539707-311997-252634 = ~975076
+// gastos fijos = 709250+80000 = 789250
+// libre = ~185826/sem
+// s16 kelly1=200000 → necesita 200k pero libre es 185k, se completa con sobrante
+// Se distribuye con los ingresos extras de s19 (prima+ayuda ~10M)
+const PLAN_SEMANAS=[
+  {sw:15,note:'Semana actual. Gastos fijos. Sin pagos de deuda esta semana para no quedar en rojo.',
+   pagos:[{id:'p15_isa_ap',n:'Apartar para tarjeta Isa',v:175000,tag:'ta',did:null}]},
+  {sw:16,note:'Kelly pago 1. Usa sobrante + neto.',
+   pagos:[{id:'p16_kelly1',n:'Kelly — abono 1',v:200000,tag:'tr',did:'kelly'},{id:'p16_isa_ap',n:'Apartar tarjeta Isa',v:175000,tag:'ta',did:null}]},
+  {sw:17,note:'Kelly pago final.',
+   pagos:[{id:'p17_kelly2',n:'Kelly — cierre',v:310000,tag:'tr',did:'kelly'},{id:'p17_isa_ap',n:'Apartar tarjeta Isa',v:175000,tag:'ta',did:null}]},
+  {sw:18,note:'Juan David. Kelly saldada.',
+   pagos:[{id:'p18_jd',n:'Juan David',v:89000,tag:'tr',did:'juandavid'},{id:'p18_isa_ap',n:'Apartar tarjeta Isa',v:175000,tag:'ta',did:null}]},
+  {sw:19,note:'DÍA CLAVE ⭐ Prima (~$6.5M) + Ayuda escolar EPM (~$3.5M). Paga Jorgito, suegra y tarjeta Isa de un golpe.',key:true,
+   pagos:[{id:'p19_prima',n:'Prima junio (ingreso)',v:6500000,tag:'tgr',did:null},{id:'p19_ayuda',n:'Ayuda escolar EPM (ingreso)',v:3500000,tag:'tgr',did:null},{id:'p19_jorgito',n:'Jorgito',v:5090000,tag:'tr',did:'jorgito'},{id:'p19_suegra',n:'Mamá de Isa',v:3200000,tag:'tr',did:'suegra'},{id:'p19_isa',n:'Tarjeta Isa — cierre',v:1700000,tag:'tr',did:'isa_tarjeta'}]},
+  {sw:20,note:'Cueros Vélez y Tigo. Usando sobrante de semana anterior.',
+   pagos:[{id:'p20_velez',n:'Cueros Vélez',v:455000,tag:'tr',did:'velez'},{id:'p20_tigo',n:'Tigo',v:200000,tag:'tr',did:'tigo'}]},
+  {sw:21,note:'🎉 FEPEP TERMINA. Neto sube a ~$1.227.710/sem. Inmobiliaria y hogar pendiente.',
+   pagos:[{id:'p21_inmo',n:'Inmobiliaria',v:180000,tag:'tr',did:'inmo'},{id:'p21_hogar',n:'Pendiente hogar',v:250000,tag:'tr',did:'hogar_p'}]},
+  {sw:22,note:'Inicia ataque a Serlefin con excedente mensual.',
+   pagos:[{id:'p22_serl',n:'Abono Serlefin',v:500000,tag:'tr',did:'serlefin'}]},
+  {sw:23,note:'Continúa abono Serlefin.',pagos:[{id:'p23_serl',n:'Abono Serlefin',v:500000,tag:'tr',did:'serlefin'}]},
+  {sw:24,note:'Continúa abono Serlefin.',pagos:[{id:'p24_serl',n:'Abono Serlefin',v:500000,tag:'tr',did:'serlefin'}]},
+  {sw:25,note:'Continúa abono Serlefin.',pagos:[{id:'p25_serl',n:'Abono Serlefin',v:500000,tag:'tr',did:'serlefin'}]},
+  {sw:26,note:'Continúa abono Serlefin.',pagos:[{id:'p26_serl',n:'Abono Serlefin',v:500000,tag:'tr',did:'serlefin'}]},
+  {sw:27,note:'Continúa abono Serlefin.',pagos:[{id:'p27_serl',n:'Abono Serlefin',v:500000,tag:'tr',did:'serlefin'}]},
+  {sw:28,note:'Continúa abono Serlefin.',pagos:[{id:'p28_serl',n:'Abono Serlefin',v:500000,tag:'tr',did:'serlefin'}]},
+  {sw:29,note:'Continúa abono Serlefin.',pagos:[{id:'p29_serl',n:'Abono Serlefin',v:500000,tag:'tr',did:'serlefin'}]},
+  {sw:30,note:'Continúa abono Serlefin.',pagos:[{id:'p30_serl',n:'Abono Serlefin',v:500000,tag:'tr',did:'serlefin'}]},
+  {sw:31,note:'Continúa abono Serlefin.',pagos:[{id:'p31_serl',n:'Abono Serlefin',v:500000,tag:'tr',did:'serlefin'}]},
+  {sw:32,note:'Continúa abono Serlefin.',pagos:[{id:'p32_serl',n:'Abono Serlefin',v:500000,tag:'tr',did:'serlefin'}]},
+  {sw:33,note:'Continúa abono Serlefin.',pagos:[{id:'p33_serl',n:'Abono Serlefin',v:500000,tag:'tr',did:'serlefin'}]},
+  {sw:34,note:'Continúa abono Serlefin.',pagos:[{id:'p34_serl',n:'Abono Serlefin',v:500000,tag:'tr',did:'serlefin'}]},
+  {sw:35,note:'Prima de mitad de año aprox. Gran abono a Serlefin.',
+   pagos:[{id:'p35_prima',n:'Prima diciembre (ingreso estimado)',v:6500000,tag:'tgr',did:null},{id:'p35_serl',n:'Gran abono Serlefin',v:5000000,tag:'tr',did:'serlefin'}]},
+  {sw:36,note:'Continúa plan Serlefin.',pagos:[{id:'p36_serl',n:'Abono Serlefin',v:500000,tag:'tr',did:'serlefin'}]},
+  {sw:37,note:'Continúa plan Serlefin.',pagos:[{id:'p37_serl',n:'Abono Serlefin',v:500000,tag:'tr',did:'serlefin'}]},
+  {sw:38,note:'Continúa plan Serlefin.',pagos:[{id:'p38_serl',n:'Abono Serlefin',v:500000,tag:'tr',did:'serlefin'}]},
+  {sw:39,note:'Continúa plan Serlefin.',pagos:[{id:'p39_serl',n:'Abono Serlefin',v:500000,tag:'tr',did:'serlefin'}]},
+  {sw:40,note:'Continúa plan Serlefin.',pagos:[{id:'p40_serl',n:'Abono Serlefin',v:500000,tag:'tr',did:'serlefin'}]},
+  {sw:41,note:'Continúa plan Serlefin.',pagos:[{id:'p41_serl',n:'Abono Serlefin',v:500000,tag:'tr',did:'serlefin'}]},
+  {sw:42,note:'Continúa plan Serlefin.',pagos:[{id:'p42_serl',n:'Abono Serlefin',v:500000,tag:'tr',did:'serlefin'}]},
+  {sw:43,note:'Continúa plan Serlefin.',pagos:[{id:'p43_serl',n:'Abono Serlefin',v:500000,tag:'tr',did:'serlefin'}]},
+  {sw:44,note:'Continúa plan Serlefin.',pagos:[{id:'p44_serl',n:'Abono Serlefin',v:500000,tag:'tr',did:'serlefin'}]},
+  {sw:45,note:'Continúa plan Serlefin.',pagos:[{id:'p45_serl',n:'Abono Serlefin',v:500000,tag:'tr',did:'serlefin'}]},
+  {sw:46,note:'Continúa plan Serlefin.',pagos:[{id:'p46_serl',n:'Abono Serlefin',v:500000,tag:'tr',did:'serlefin'}]},
+  {sw:47,note:'Continúa plan Serlefin.',pagos:[{id:'p47_serl',n:'Abono Serlefin',v:500000,tag:'tr',did:'serlefin'}]},
+  {sw:48,note:'Continúa plan Serlefin.',pagos:[{id:'p48_serl',n:'Abono Serlefin',v:500000,tag:'tr',did:'serlefin'}]},
+  {sw:49,note:'Continúa plan Serlefin.',pagos:[{id:'p49_serl',n:'Abono Serlefin',v:500000,tag:'tr',did:'serlefin'}]},
+  {sw:50,note:'Continúa plan Serlefin.',pagos:[{id:'p50_serl',n:'Abono Serlefin',v:500000,tag:'tr',did:'serlefin'}]},
+  {sw:51,note:'Continúa plan Serlefin.',pagos:[{id:'p51_serl',n:'Abono Serlefin',v:500000,tag:'tr',did:'serlefin'}]},
+  {sw:52,note:'🏆 Fin de año. Prima diciembre → posible cierre total de Serlefin.',
+   pagos:[{id:'p52_prima',n:'Prima diciembre (ingreso estimado)',v:6500000,tag:'tgr',did:null},{id:'p52_serl',n:'Abono final Serlefin',v:5000000,tag:'tr',did:'serlefin'}]},
+];
+
+// ── UTILS ─────────────────────────────────────────────────────────────────────
+const fmt=n=>'$'+Math.abs(Math.round(n)).toLocaleString('es-CO');
+function getWeekDate(sw){
+  const d=new Date(START_DATE);
+  d.setDate(d.getDate()+(sw-START_WEEK)*7);
+  return d.toLocaleDateString('es-CO',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+}
+function getFepep(sw){
+  // FEPEP se descuenta desde s15, va bajando. Termina en s21.
+  if(sw>=22) return 0;
+  const offset=sw-START_WEEK; // 0-based desde s15
+  let total=0;
+  FEPEP_CREDITOS.forEach(c=>{
+    let saldo=c.saldo;
+    for(let i=0;i<offset;i++) saldo=Math.max(0,saldo-c.cuota);
+    if(saldo>0) total+=Math.min(saldo,c.cuota);
+  });
+  return total;
+}
+function getNetoSemana(sw){return INGRESO-FIJAS-getFepep(sw);}
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let ST={}, dbRef=null, ready=false, currentWeek=15, currentTab='hogar', modalCB=null;
+
+try{
+  const app=initializeApp(FC);
+  const db=getDatabase(app);
+  dbRef=ref(db,'fjl_v4');
+  onValue(dbRef,snap=>{
+    ST=snap.val()||{};
+    ready=true;
+    document.getElementById('dot').className='dot on';
+    document.getElementById('slbl').textContent='En línea';
+    renderAll();
+  },()=>fallback());
+}catch(e){fallback();}
+
+function fallback(){
+  try{ST=JSON.parse(localStorage.getItem('fjl4')||'{}');}catch(e){ST={};}
+  document.getElementById('slbl').textContent='Solo local';
+  renderAll();
+}
+function save(){
+  if(ready&&dbRef)set(dbRef,ST);
+  else try{localStorage.setItem('fjl4',JSON.stringify(ST));}catch(e){}
+}
+
+// ── SALDO DINÁMICO DE DEUDAS ──────────────────────────────────────────────────
+// Calcula el saldo actual de cada deuda sumando todos los abonos del plan que ya fueron marcados
+function getSaldoDeudas(){
+  const saldos={};
+  DEUDAS_BASE.forEach(d=>saldos[d.id]=d.saldo);
+  if(!ST.plan) return saldos;
+  PLAN_SEMANAS.forEach(s=>{
+    s.pagos.forEach(p=>{
+      if(p.did && p.tag!=='tgr'){
+        const ps=ST.plan[p.id];
+        if(ps&&ps.paid){
+          saldos[p.did]=Math.max(0,(saldos[p.did]||0)-p.v);
+        } else if(ps&&ps.abono>0){
+          saldos[p.did]=Math.max(0,(saldos[p.did]||0)-ps.abono);
+        }
+      }
+    });
+  });
+  // también abonos directos desde tab deudas
+  if(ST.deudas_directo){
+    Object.entries(ST.deudas_directo).forEach(([id,v])=>{
+      saldos[id]=Math.max(0,(saldos[id]||0)-v);
+    });
+  }
+  return saldos;
+}
+
+// ── GASTADO SEMANA ────────────────────────────────────────────────────────────
+function getGastado(sw){
+  const wk=ST['w'+sw]||{};
+  let total=0;
+  HOGAR.forEach(i=>{if((wk.hogar?.[i.id]||{}).paid) total+=i.v;});
+  PERSONAL.forEach(i=>{if((wk.personal?.[i.id]||{}).paid) total+=i.v;});
+  // Plan pagos de esta semana
+  const ps=PLAN_SEMANAS.find(s=>s.sw===sw);
+  if(ps) ps.pagos.forEach(p=>{
+    if(p.tag==='tgr') return; // ingresos no cuentan como gasto
+    const pst=ST.plan?.[p.id];
+    if(pst&&pst.paid) total+=p.v;
+    else if(pst&&pst.abono) total+=pst.abono;
+  });
+  const hE=((wk.extras?.hogar)||[]).reduce((a,e)=>a+e.val,0);
+  const pE=((wk.extras?.personal)||[]).reduce((a,e)=>a+e.val,0);
+  return total+hE+pE;
+}
+
+// ── HERO ──────────────────────────────────────────────────────────────────────
+function renderHero(){
+  const neto=getNetoSemana(currentWeek);
+  const fepep=getFepep(currentWeek);
+  const gastado=getGastado(currentWeek);
+  const disp=neto-gastado;
+  const pct=Math.min(100,Math.round(gastado/neto*100));
+  const hv=document.getElementById('hero-val');
+  hv.textContent=fmt(disp);
+  hv.className='hero-val '+(disp>=0?'pos':'neg');
+  document.getElementById('hero-sub').textContent=`Neto: ${fmt(neto)} — Gastado: ${fmt(gastado)} — Fijos pendientes: ${fmt(Math.max(0,(TOTAL_HOGAR+TOTAL_PERS)-gastado))}`;
+  const pf=document.getElementById('prog-fill');
+  pf.style.width=pct+'%';
+  pf.style.background=pct>90?'var(--red)':pct>70?'var(--amber)':'var(--green)';
+  document.getElementById('m-neto').textContent=fmt(neto);
+  document.getElementById('m-fepep').textContent=fepep>0?fmt(fepep):'$0 ✓';
+  document.getElementById('m-gastado').textContent=fmt(gastado);
+}
+
+// ── WEEK NAV ──────────────────────────────────────────────────────────────────
+window.changeWeek=function(d){
+  currentWeek=Math.max(15,Math.min(52,currentWeek+d));
+  document.getElementById('wlabel').textContent='S'+currentWeek;
+  document.getElementById('wdate').textContent=getWeekDate(currentWeek);
+  renderAll();
+};
+
+// ── TAB ───────────────────────────────────────────────────────────────────────
+window.switchTab=function(t){
+  currentTab=t;
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('view-'+t).classList.add('active');
+  ['hogar','personal','deudas','plan'].forEach((x,i)=>{
+    if(x===t) document.querySelectorAll('.tab')[i].classList.add('active');
+  });
+};
+
+// ── HELPERS ───────────────────────────────────────────────────────────────────
+function wkSt(sec,id){return (ST['w'+currentWeek]?.[sec]?.[id])||{paid:false};}
+function setWkSt(sec,id,val){
+  if(!ST['w'+currentWeek]) ST['w'+currentWeek]={};
+  if(!ST['w'+currentWeek][sec]) ST['w'+currentWeek][sec]={};
+  ST['w'+currentWeek][sec][id]=val;
+  save();renderAll();
+}
+
+// ── HOGAR ─────────────────────────────────────────────────────────────────────
+function renderHogar(){
+  const wk=ST['w'+currentWeek]||{};
+  const extras=(wk.extras?.hogar)||[];
+  let paid=0;
+  document.getElementById('hogar-list').innerHTML=HOGAR.map(i=>{
+    const s=wkSt('hogar',i.id);
+    if(s.paid) paid+=i.v;
+    return `<div class="row" onclick="toggleFixed('hogar','${i.id}',${i.v})">
+      <button class="chk ${s.paid?'paid':''}">${s.paid?'✓':''}</button>
+      <div class="row-info">
+        <div class="row-name ${s.paid?'done':''}">${i.n}</div>
+        ${s.paid?'<div class="row-sub g">✓ Pagado — restado del disponible</div>':'<div class="row-sub">Toca para marcar pagado</div>'}
+      </div>
+      <div class="row-right">
+        <div class="row-amt ${s.paid?'done':''}">${fmt(i.v)}</div>
+        <span class="tag tg">FIJO</span>
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('h-amt').textContent=`${fmt(paid)} / ${fmt(TOTAL_HOGAR)}`;
+  document.getElementById('hogar-extras').innerHTML=extras.map(e=>`
+    <div class="row">
+      <div class="row-info"><div class="row-name">${e.desc}</div></div>
+      <div class="row-right">
+        <div class="row-amt" style="color:var(--amber)">${fmt(e.val)}</div>
+        <button class="act w" onclick="event.stopPropagation();removeExtra('hogar','${e.id}')">Quitar</button>
+      </div>
+    </div>`).join('');
+}
+window.toggleFixed=function(sec,id,v){
+  const s=wkSt(sec,id);
+  setWkSt(sec,id,{paid:!s.paid});
+};
+
+// ── PERSONAL ──────────────────────────────────────────────────────────────────
+function renderPersonal(){
+  const wk=ST['w'+currentWeek]||{};
+  const extras=(wk.extras?.personal)||[];
+  let paid=0;
+  document.getElementById('personal-list').innerHTML=PERSONAL.map(i=>{
+    const s=wkSt('personal',i.id);
+    if(s.paid) paid+=i.v;
+    return `<div class="row" onclick="toggleFixed('personal','${i.id}',${i.v})">
+      <button class="chk ${s.paid?'paid':''}">${s.paid?'✓':''}</button>
+      <div class="row-info">
+        <div class="row-name ${s.paid?'done':''}">${i.n}</div>
+        ${s.paid?'<div class="row-sub g">✓ Pagado</div>':''}
+      </div>
+      <div class="row-right">
+        <div class="row-amt ${s.paid?'done':''}">${fmt(i.v)}</div>
+        <span class="tag tg">FIJO</span>
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('p-amt').textContent=`${fmt(paid)} / ${fmt(TOTAL_PERS)}`;
+  document.getElementById('personal-extras').innerHTML=extras.map(e=>`
+    <div class="row">
+      <div class="row-info"><div class="row-name">${e.desc}</div></div>
+      <div class="row-right">
+        <div class="row-amt" style="color:var(--amber)">${fmt(e.val)}</div>
+        <button class="act w" onclick="event.stopPropagation();removeExtra('personal','${e.id}')">Quitar</button>
+      </div>
+    </div>`).join('');
+}
+
+// ── EXTRAS ────────────────────────────────────────────────────────────────────
+window.addExtra=function(sec){
+  const desc=document.getElementById(sec[0]+'e-d').value.trim();
+  const val=parseInt(document.getElementById(sec[0]+'e-v').value)||0;
+  if(!desc||!val)return;
+  if(!ST['w'+currentWeek]) ST['w'+currentWeek]={};
+  if(!ST['w'+currentWeek].extras) ST['w'+currentWeek].extras={};
+  if(!ST['w'+currentWeek].extras[sec]) ST['w'+currentWeek].extras[sec]=[];
+  ST['w'+currentWeek].extras[sec].push({desc,val,id:'e'+Date.now()});
+  document.getElementById(sec[0]+'e-d').value='';
+  document.getElementById(sec[0]+'e-v').value='';
+  save();renderAll();
+};
+window.removeExtra=function(sec,id){
+  if(!ST['w'+currentWeek]?.extras?.[sec])return;
+  ST['w'+currentWeek].extras[sec]=ST['w'+currentWeek].extras[sec].filter(e=>e.id!==id);
+  save();renderAll();
+};
+
+// ── DEUDAS ────────────────────────────────────────────────────────────────────
+function renderDeudas(){
+  const saldos=getSaldoDeudas();
+  let pend=0,pag=0;
+  const totalBase=DEUDAS_BASE.reduce((a,d)=>a+d.saldo,0);
+  document.getElementById('deudas-list').innerHTML=DEUDAS_BASE.map(d=>{
+    const saldo=saldos[d.id]||0;
+    const pagado=d.saldo-saldo;
+    if(saldo<=0) pag+=d.saldo; else pend+=saldo;
+    const saldada=saldo<=0;
+    const pct=Math.round(pagado/d.saldo*100);
+    return `<div class="row">
+      <button class="chk ${saldada?'paid':pagado>0?'partial':''}">${saldada?'✓':pagado>0?'~':''}</button>
+      <div class="row-info">
+        <div class="row-name ${saldada?'done':''}">${d.n}</div>
+        ${saldada?'<div class="row-sub g">✓ Saldada completamente</div>':
+          pagado>0?`<div class="row-sub w">Pagado: ${fmt(pagado)} (${pct}%) — Falta: ${fmt(saldo)}</div>`:
+          `<div class="row-sub r">Sin abonar aún</div>`}
+      </div>
+      <div class="row-right">
+        <div class="row-amt ${saldada?'done':''}">${saldada?fmt(0):fmt(saldo)}</div>
+        <span class="tag ${d.tag}">${d.tl}</span>
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('d-amt').textContent=`Pendiente: ${fmt(pend)} / Total: ${fmt(totalBase)}`;
+}
+
+// ── PLAN ──────────────────────────────────────────────────────────────────────
+function renderPlan(){
+  if(!ST.plan) ST.plan={};
+  const html=PLAN_SEMANAS.map(s=>{
+    const esPagos=s.pagos.filter(p=>p.tag!=='tgr');
+    const done=esPagos.filter(p=>(ST.plan[p.id]||{}).paid).length;
+    const pct=esPagos.length?Math.round(done/esPagos.length*100):0;
+    const allDone=done===esPagos.length&&esPagos.length>0;
+    const isCurrent=s.sw===currentWeek;
+    const bCls=isCurrent?'wb-cur':allDone?'wb-done':done>0?'wb-part':s.key?'wb-key':'wb-pend';
+    const bTxt=isCurrent?'← ACTUAL':allDone?'✓ Lista':done>0?`${done}/${esPagos.length}`:s.key?'⭐ Clave':'Pendiente';
+
+    // calcular neto y si quedaría en rojo
+    const netoS=getNetoSemana(s.sw);
+    const totalPagosDeuda=esPagos.reduce((a,p)=>a+p.v,0);
+    const disponiblePostFijos=netoS-TOTAL_HOGAR-TOTAL_PERS;
+    const alerta=totalPagosDeuda>disponiblePostFijos;
+
+    const rows=s.pagos.map(p=>{
+      const ps=ST.plan[p.id]||{paid:false,abono:0};
+      const isInc=p.tag==='tgr';
+      const paid=ps.paid;
+      const abono=ps.abono||0;
+      const rest=p.v-abono;
+      return `<div class="row">
+        <button class="chk ${paid?'paid':abono>0?'partial':''}" onclick="togglePlan('${p.id}',${p.v},'${p.did||''}')">
+          ${paid?'✓':abono>0?'~':''}
+        </button>
+        <div class="row-info">
+          <div class="row-name ${paid?'done':''}">${p.n}</div>
+          ${paid?`<div class="row-sub g">✓ Hecho — saldo deuda actualizado</div>`:
+            abono>0?`<div class="row-sub w">Abonado: ${fmt(abono)} — Falta: ${fmt(rest)}</div>`:''}
+          ${!paid?`<div class="acts">
+            <button class="act g" onclick="event.stopPropagation();togglePlan('${p.id}',${p.v},'${p.did||''}')">
+              ${isInc?'Confirmar ingreso':'Marcar pagado'}
+            </button>
+            ${!isInc?`<button class="act w" onclick="event.stopPropagation();abonoPlan('${p.id}','${p.n}',${p.v},${abono},'${p.did||''}')">Abono parcial</button>`:''}
+          </div>`:
+          `<div class="acts"><button class="act" onclick="event.stopPropagation();togglePlan('${p.id}',${p.v},'${p.did||''}')">Deshacer</button></div>`}
+        </div>
+        <div class="row-right">
+          <div class="row-amt ${paid?'done':''}">${fmt(p.v)}</div>
+          <span class="tag ${p.tag}">${isInc?'INGRESO':'PAGO'}</span>
+        </div>
+      </div>`;
+    }).join('');
+
+    return `<div class="week-blk ${isCurrent?'current-week':''}" id="wb${s.sw}">
+      <div class="whdr" onclick="toggleWB(${s.sw})">
+        <div class="whl">
+          <div>
+            <div class="wnum">SEMANA ${s.sw}</div>
+            <div class="wdate2">${getWeekDate(s.sw).replace('jueves, ','')}</div>
+          </div>
+          <span class="wbadge ${bCls}">${bTxt}</span>
+          ${alerta&&!allDone?'<span class="wbadge wb-pend" style="color:var(--amber);background:var(--ad)">⚠ ajustado</span>':''}
+        </div>
+        <span class="chev">▼</span>
+      </div>
+      <div class="wprog"><div class="wprog-fill" style="width:${pct}%"></div></div>
+      <div class="wbody ${isCurrent?'':'collapsed2'}">
+        ${rows}
+        <div class="wnote"><b>💡 </b>${s.note} <b>Disponible post-fijos: ${fmt(disponiblePostFijos)}</b></div>
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('plan-list').innerHTML=html;
+  // Auto-expand current week, collapse others
+  PLAN_SEMANAS.forEach(s=>{
+    const wb=document.getElementById('wb'+s.sw);
+    if(wb){
+      const body=wb.querySelector('.wbody');
+      if(s.sw!==currentWeek) wb.classList.add('collapsed');
+      else wb.classList.remove('collapsed');
+    }
+  });
+}
+
+window.toggleWB=function(sw){document.getElementById('wb'+sw).classList.toggle('collapsed');};
+
+window.togglePlan=function(pid,total,did){
+  if(!ST.plan) ST.plan={};
+  const cur=ST.plan[pid]||{};
+  ST.plan[pid]=cur.paid?{paid:false,abono:0}:{paid:true,abono:total};
+  save();renderAll();
+};
+
+window.abonoPlan=function(pid,name,total,current,did){
+  openModal('Abono — '+name,`Total: ${fmt(total)} — Abonado: ${fmt(current)}`,v=>{
+    if(!v)return;
+    if(!ST.plan) ST.plan={};
+    const newAb=Math.min(current+v,total);
+    ST.plan[pid]={paid:newAb>=total,abono:newAb};
+    save();renderAll();
+  });
+};
+
+// ── MODAL ─────────────────────────────────────────────────────────────────────
+window.openModal=function(title,sub,cb){
+  document.getElementById('m-title').textContent=title;
+  document.getElementById('m-sub').textContent=sub;
+  document.getElementById('m-inp').value='';
+  modalCB=cb;
+  document.getElementById('modal').classList.add('open');
+  setTimeout(()=>document.getElementById('m-inp').focus(),100);
+};
+window.closeModal=function(){document.getElementById('modal').classList.remove('open');modalCB=null;};
+window.confirmModal=function(){
+  const v=parseInt(document.getElementById('m-inp').value)||0;
+  if(modalCB) modalCB(v);
+  closeModal();
+};
+document.getElementById('modal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal();});
+
+function renderAll(){renderHero();renderHogar();renderPersonal();renderDeudas();renderPlan();}
+
+// Init
+document.getElementById('wlabel').textContent='S'+currentWeek;
+document.getElementById('wdate').textContent=getWeekDate(currentWeek);
+</script>
+</body>
+</html>
